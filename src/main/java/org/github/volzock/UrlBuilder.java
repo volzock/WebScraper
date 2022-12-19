@@ -2,6 +2,9 @@ package org.github.volzock;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UrlBuilder {
     private String url;
@@ -13,7 +16,6 @@ public class UrlBuilder {
             if (!"http".equals(url.getProtocol())) {
                 this.url = null;
             }
-
         } catch (MalformedURLException ignored) {
             try {
                 host = new URL(baseURL).getHost();
@@ -23,7 +25,18 @@ public class UrlBuilder {
             if (word.contains("#") || word.startsWith("mailto:") || word.startsWith("javascript")) {
                 this.url = null;
             } else if (word.startsWith("../")) {
-                this.url = null;
+                List<String> relativeUrlComponents = Arrays.stream(word.split("../")).collect(Collectors.toList());
+                List<String> currentUrlComponents = Arrays.stream(baseURL.split("/")).collect(Collectors.toList());
+
+                if (currentUrlComponents.size() - 2 - relativeUrlComponents.size() >= 0) {
+                    baseURL = currentUrlComponents
+                            .stream()
+                            .limit(currentUrlComponents.size() - relativeUrlComponents.size() + 1)
+                            .collect(Collectors.joining("/"));
+                    this.url =  baseURL + "/" + relativeUrlComponents.get(relativeUrlComponents.size() - 1);
+                } else {
+                    this.url = null;
+                }
             } else {
                 if (word.startsWith("/")) {
                     this.url = "http://" + host + word;
