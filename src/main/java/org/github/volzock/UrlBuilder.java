@@ -42,11 +42,16 @@ public class UrlBuilder {
                     this.url = "http://" + host + word;
                 } else {
                     int lastIndexOfReapetedWord = word.indexOf("/");
-                    String repeatedWord = word.substring(0, lastIndexOfReapetedWord);
-                    if (baseURL.endsWith(repeatedWord)) {
-                        this.url = baseURL + (baseURL.endsWith("/") ? "" : "/") + word.substring(lastIndexOfReapetedWord + 1);
+
+                    if (lastIndexOfReapetedWord == -1) {
+                        this.url = null;
                     } else {
-                        this.url = baseURL + (baseURL.endsWith("/") ? "" : "/") + word;
+                        String repeatedWord = word.substring(0, lastIndexOfReapetedWord);
+                        if (baseURL.endsWith(repeatedWord)) {
+                            this.url = baseURL + (baseURL.endsWith("/") ? "" : "/") + word.substring(lastIndexOfReapetedWord + 1);
+                        } else {
+                            this.url = baseURL + (baseURL.endsWith("/") ? "" : "/") + word;
+                        }
                     }
                 }
             }
